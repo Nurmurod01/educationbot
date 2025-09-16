@@ -42,21 +42,59 @@ const questions = [
 
 type Page = "welcome" | "test" | "result";
 
+interface TelegramUser {
+  id: number;
+  is_bot?: boolean;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  is_premium?: boolean;
+  allows_write_to_pm?: boolean;
+  photo_url?: string;
+}
+// types/telegram.d.ts
+export {};
+
+declare global {
+  interface TelegramWebAppUser {
+    id: number;
+    first_name: string;
+    last_name?: string;
+    username?: string;
+    language_code?: string;
+  }
+
+  interface TelegramWebApp {
+    initData: string;
+    initDataUnsafe: {
+      user?: TelegramWebAppUser;
+    };
+  }
+
+  interface Window {
+    Telegram?: {
+      WebApp?: TelegramWebApp;
+    };
+  }
+}
+
 export default function WordBottleApp(): JSX.Element {
   const [currentPage, setCurrentPage] = useState<Page>("welcome");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const [testStarted, setTestStarted] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp;
 
     if (tg && tg.initDataUnsafe?.user) {
       setUser(tg.initDataUnsafe.user);
     }
   }, []);
+
   useEffect(() => {
     if (testStarted && timeLeft > 0 && currentPage === "test") {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);

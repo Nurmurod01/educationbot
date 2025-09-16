@@ -20,6 +20,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   home,
   onrestart,
 }) => {
+  const a = score;
+  const b = questions;
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">
       <div className="absolute top-3 start-3 end-3 bottom-3 rounded-2xl p-4 bg-[#A42FC1]">
@@ -38,7 +40,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <h1 className="text-4xl text-[#A42FC1] text-center font-bold tracking-wider">
             Score
           </h1>
-          <h1 className="text-3xl text-green-600 font-semibold">30</h1>
+          <h1 className="text-3xl text-green-600 font-semibold">30 {a}</h1>
           <h1 className="font-semibold">40 correct</h1>
           <div className="flex justify-around items-center gap-12">
             <button onClick={onrestart}>
