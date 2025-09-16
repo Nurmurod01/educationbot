@@ -59,14 +59,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
 
           <button
             onClick={onStartTest}
-            className="relative z-20 flex  bg-white text-[#A42FC1] font-bold rounded-full h-28 w-28 shadow-lg"
+            className="relative z-20 flex justify-center items-center bg-white text-[#A42FC1] font-bold rounded-full h-28 w-28 shadow-lg"
           >
             <Image
               src={PlayBtn}
               height={40}
               width={40}
               alt="Level"
-              className="ps-2 mx-auto"
+              className="ps-2 mx-auto my-auto"
             />
           </button>
         </div>
