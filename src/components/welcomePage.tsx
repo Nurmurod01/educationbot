@@ -36,7 +36,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
         <div className="flex flex-col gap-16 justify-center items-center mt-32  p-3">
           <div className="w-full text-center text-[#A42FC1] drop-shadow-[0_10px_20px_rgba(164,47,193,0.5)]  bg-white shadow-2xl rounded-2xl p-5">
             <h1 className="text-xl font-semibold">Welcome</h1>
-            <h1 className="text-4xl font-extrabold">{user.username}</h1>
+            <h1 className="text-4xl font-extrabold">{user?.username}</h1>
             <div className="flex justify-around items-center mt-4 mb-3">
               <div className="flex items-center gap-2 mt-6 text-[#FA3939] font-semibold text-xl">
                 <Image src={Charge} alt="Level" />
