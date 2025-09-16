@@ -31,7 +31,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="absolute top-5 end-56 w-10 h-10 rounded-full bg-white/10 z-10"></div>
         <div className="absolute bottom-44 start-10 w-10 h-10 rounded-full bg-white/10 z-10"></div>
 
-        <div className="w-full bg-white flex flex-col items-center gap-3 mt-56 p-5 rounded-3xl">
+        <div className="w-full bg-white flex flex-col items-center gap-3 mt-44 p-5 rounded-3xl">
           <h1 className="text-4xl text-[#A42FC1] text-center font-bold tracking-wider">
             Score
           </h1>
