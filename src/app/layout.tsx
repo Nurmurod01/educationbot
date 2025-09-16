@@ -27,6 +27,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
         {children}
       </body>
     </html>

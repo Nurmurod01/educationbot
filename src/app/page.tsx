@@ -48,8 +48,15 @@ export default function WordBottleApp(): JSX.Element {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const [testStarted, setTestStarted] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
-  // Timer effect
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+
+    if (tg && tg.initDataUnsafe?.user) {
+      setUser(tg.initDataUnsafe.user);
+    }
+  }, []);
   useEffect(() => {
     if (testStarted && timeLeft > 0 && currentPage === "test") {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -96,7 +103,7 @@ export default function WordBottleApp(): JSX.Element {
 
   // Render based on current page
   if (currentPage === "welcome") {
-    return <WelcomeScreen onStartTest={startTest} />;
+    return <WelcomeScreen onStartTest={startTest} user={user} />;
   }
 
   if (currentPage === "test") {
@@ -114,7 +121,12 @@ export default function WordBottleApp(): JSX.Element {
 
   if (currentPage === "result") {
     return (
-      <ResultScreen score={score} questions={questions} home={restart} onrestart={startTest} />
+      <ResultScreen
+        score={score}
+        questions={questions}
+        home={restart}
+        onrestart={startTest}
+      />
     );
   }
 
