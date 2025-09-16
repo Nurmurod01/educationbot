@@ -2,23 +2,23 @@ import { ChevronLeft, Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Question {
+  id: number;
   question: string;
   options: string[];
   correct: number;
 }
 
 interface TestScreenProps {
-  questions: Question[];
-  currentQuestion: number;
+  question: Question;
   timeLeft: number;
+  totalAnswered: number;
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
   onSelectAnswer: (index: number) => void;
   onGoBack: () => void;
 }
 
 const TestScreen: React.FC<TestScreenProps> = ({
-  questions,
-  currentQuestion,
+  question,
   timeLeft,
   setTimeLeft,
   onSelectAnswer,
@@ -27,19 +27,18 @@ const TestScreen: React.FC<TestScreenProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState<"+2" | "-3" | null>(null);
-
   const [animatedProgress, setAnimatedProgress] = useState(timeLeft);
 
   useEffect(() => {
     let frame: number;
-    const duration = 400; // animatsiya davomiyligi (ms)
+    const duration = 400;
     const start = performance.now();
     const from = animatedProgress;
     const to = timeLeft;
 
     const animate = (now: number) => {
       const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1); // 0..1
+      const progress = Math.min(elapsed / duration, 1);
       const value = from + (to - from) * progress;
       setAnimatedProgress(value);
 
@@ -49,9 +48,8 @@ const TestScreen: React.FC<TestScreenProps> = ({
     };
 
     frame = requestAnimationFrame(animate);
-
     return () => cancelAnimationFrame(frame);
-  }, [timeLeft]);
+  }, [timeLeft, animatedProgress]);
 
   const handleAnswerSelect = (selectedIndex: number) => {
     if (showFeedback) return;
@@ -59,7 +57,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
     setSelectedAnswer(selectedIndex);
     setShowFeedback(true);
 
-    const isCorrect = selectedIndex === questions[currentQuestion].correct;
+    const isCorrect = selectedIndex === question.correct;
     if (isCorrect) {
       setFeedbackText("+2");
       setTimeLeft((prev) => prev + 2);
@@ -84,7 +82,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
           "absolute top-[18px] end-3 w-5 h-5 border-2 border-[#A42FC1] rounded-full flex items-center justify-center",
       };
 
-    const isCorrect = index === questions[currentQuestion].correct;
+    const isCorrect = index === question.correct;
     const isSelected = index === selectedAnswer;
 
     if (isCorrect) {
@@ -114,14 +112,11 @@ const TestScreen: React.FC<TestScreenProps> = ({
         <div className="absolute top-0 start-0 end-0 bg-[#A42FC1] h-52 rounded-4xl m-2 -z-10"></div>
 
         {/* Header */}
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-start mb-4">
           <div className="flex items-center text-white space-x-2">
             <button onClick={onGoBack} className="p-1">
               <ChevronLeft />
             </button>
-          </div>
-          <div className="text-white px-3 py-2 rounded-full font-bold shadow-md">
-            score: 106
           </div>
         </div>
 
@@ -168,14 +163,14 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-800 leading-relaxed">
-              {questions[currentQuestion].question}
+              {question.question}
             </h2>
           </div>
         </div>
 
         {/* Answer Options */}
         <div className="space-y-3 mx-5">
-          {questions[currentQuestion].options.map((option, index) => {
+          {question.options.map((option, index) => {
             const iconStyle = getIconStyle(index);
             return (
               <button
