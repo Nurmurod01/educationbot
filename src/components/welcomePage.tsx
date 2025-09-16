@@ -57,7 +57,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
         setData(json);
       } catch (error) {
         console.error("Failed to fetch user info", error);
-        setError("Failed to load user information");
+        setError("Failed to load user information" + error);
       } finally {
         setLoading(false);
       }
