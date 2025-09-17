@@ -42,7 +42,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
       setError("User ma'lumotlari topilmadi");
       return;
     }
-
+    const userID = user.id || 822245102;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
