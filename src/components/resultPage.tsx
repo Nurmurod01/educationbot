@@ -1,5 +1,9 @@
+"use client";
 import Image from "next/image";
 import { Home, Return } from "./image";
+import React, { useEffect } from "react";
+import axios from "axios";
+import { TelegramUser } from "@/app/page";
 
 interface ResultScreenProps {
   score: number;
@@ -14,7 +18,36 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   home,
   onrestart,
 }) => {
-  const finalScore = score; // Har bir to'g'ri javob uchun 2 ball
+  const [user, setUser] = React.useState<TelegramUser | null>(null);
+  const finalScore = score;
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.initDataUnsafe?.user) {
+      setUser(tg.initDataUnsafe.user);
+    }
+  }, []);
+
+  useEffect(() => {
+    const sendData = async () => {
+      try {
+        const res = await axios.post(
+          "https://api.pravaol.uz/api/user/add-coin",
+          {
+            user_id: user?.id,
+            amount: score,
+          }
+        );
+      } catch (error: any) {
+        if (error.response?.data) {
+          console.error("Serverdan xatolik:", error.response.data);
+        } else {
+          console.error("Xatolik:", error.message);
+        }
+      }
+    };
+
+    sendData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">
@@ -41,31 +74,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
           <h1 className="font-semibold">
             {score} / {totalAnswered} correct
           </h1>
-
-          {/* Performance message */}
-          <div className="text-center mt-2">
-            {score === totalAnswered && totalAnswered > 0 && (
-              <p className="text-green-600 font-semibold">Perfect! 🎉</p>
-            )}
-            {score / totalAnswered >= 0.8 &&
-              score !== totalAnswered &&
-              totalAnswered > 0 && (
-                <p className="text-blue-600 font-semibold">Excellent! 👏</p>
-              )}
-            {score / totalAnswered >= 0.6 && score / totalAnswered < 0.8 && (
-              <p className="text-yellow-600 font-semibold">Good job! 👍</p>
-            )}
-            {score / totalAnswered < 0.6 && totalAnswered > 0 && (
-              <p className="text-orange-600 font-semibold">
-                Keep practicing! 💪
-              </p>
-            )}
-            {totalAnswered === 0 && (
-              <p className="text-gray-600 font-semibold">
-                No questions answered
-              </p>
-            )}
-          </div>
 
           <div className="flex justify-around items-center gap-12 mt-4">
             <button onClick={onrestart} className="flex flex-col items-center">

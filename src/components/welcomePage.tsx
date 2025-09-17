@@ -39,16 +39,16 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
   useEffect(() => {
     // if (!user || !user.id) {
     //   setLoading(false);
-    //   setError("User ma'lumotlari topilmadi");
+    //   setError("Siz telegramdan kirmadingiz!");
     //   return;
     // }
-    const userID = user?.id || 822245102;
+    const userID = user?.id;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const apiUrl = `http://49.13.163.83:8083/api/user-info/${userID}`;
+        const apiUrl = `https://api.pravaol.uz/api/user-info/${userID}`;
 
         const res = await axios.get<UserInfo>(apiUrl);
 

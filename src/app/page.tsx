@@ -98,7 +98,7 @@ export default function WordBottleApp(): JSX.Element {
     setLoading(true);
     try {
       const questionsRes = await fetch(
-        `http://49.13.163.83:8083/api/quiz/${userId}`
+        `https://api.pravaol.uz/api/quiz/${userId}`
       );
 
       if (questionsRes.ok) {
