@@ -37,18 +37,18 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user.id) {
-      setLoading(false);
-      setError("User ma'lumotlari topilmadi");
-      return;
-    }
-    const userID = user.id || 822245102;
+    // if (!user || !user.id) {
+    //   setLoading(false);
+    //   setError("User ma'lumotlari topilmadi");
+    //   return;
+    // }
+    const userID = user?.id || 822245102;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const apiUrl = `http://49.13.163.83:8083/api/user-info/${user.id}`;
+        const apiUrl = `http://49.13.163.83:8083/api/user-info/${userID}`;
 
         const res = await axios.get<UserInfo>(apiUrl);
 
