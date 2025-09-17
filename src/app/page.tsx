@@ -89,11 +89,11 @@ export default function WordBottleApp(): JSX.Element {
 
   // Load questions from API
   const loadQuestions = async () => {
-    if (!user?.id) return;
+    // if (!user?.id) return;
 
     setLoading(true);
     try {
-      const res = await fetch(`http://49.13.163.83:8083/api/quiz/${user.id}`);
+      const res = await fetch(`http://49.13.163.83:8083/api/quiz/822245102`);
       if (!res.ok) throw new Error("Failed to fetch questions");
 
       const apiQuestions: ApiQuestion[] = await res.json();
