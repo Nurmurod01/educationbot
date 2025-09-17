@@ -68,7 +68,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
           errorMessage += `: ${err.message}`;
         }
 
-        setError(errorMessage);
+        setError(errorMessage + err);
       } finally {
         setLoading(false);
       }
