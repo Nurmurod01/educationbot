@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import WelcomeScreen from "@/components/welcomePage";
 
 // API Question interface
-interface ApiQuestion {
+export interface ApiQuestion {
   id: number;
   level: number;
   word: string;
@@ -19,12 +19,15 @@ interface ApiQuestion {
   }[];
 }
 
-// Converted question format for the app
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correct: number;
+// API User Response interface
+export interface ApiUserResponse {
+  user_id: number;
+  username: string;
+  full_name: string;
+  level: {
+    name: string;
+  };
+  coin: number;
 }
 
 type Page = "welcome" | "test" | "result";
@@ -68,14 +71,16 @@ declare global {
 
 export default function WordBottleApp(): JSX.Element {
   const [currentPage, setCurrentPage] = useState<Page>("welcome");
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<ApiQuestion[]>([]);
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<number>>(
     new Set()
   );
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<ApiQuestion | null>(
+    null
+  );
   const [score, setScore] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(20); // 1 daqiqa
+  const [timeLeft, setTimeLeft] = useState(20);
   const [testStarted, setTestStarted] = useState(false);
   const [user, setUser] = useState<TelegramUser | null>(null);
   const [loading, setLoading] = useState(false);
@@ -87,76 +92,62 @@ export default function WordBottleApp(): JSX.Element {
     }
   }, []);
 
-  // Load questions from API
   const loadQuestions = async () => {
-    // if (!user?.id) return;
+    const userId = user?.id;
 
     setLoading(true);
     try {
-      const res = await fetch(`http://49.13.163.83:8083/api/quiz/822245102`);
-      if (!res.ok) throw new Error("Failed to fetch questions");
+      const questionsRes = await fetch(
+        `http://49.13.163.83:8083/api/quiz/${userId}`
+      );
 
-      const apiQuestions: ApiQuestion[] = await res.json();
-
-      // Convert API format to app format
-      const convertedQuestions: Question[] = apiQuestions.map((apiQ) => {
-        const correctIndex = apiQ.options.findIndex((opt) => opt.is_correct);
-        return {
-          id: apiQ.id,
-          question: apiQ.word,
-          options: apiQ.options.map((opt) => opt.option),
-          correct: correctIndex,
-        };
-      });
-
-      setQuestions(convertedQuestions);
+      if (questionsRes.ok) {
+        const apiQuestions: ApiQuestion[] = await questionsRes.json();
+        setQuestions(apiQuestions);
+      } else {
+        console.warn("Questions endpoint not available, using fallback");
+        setQuestions([]);
+      }
     } catch (error) {
       console.error("Error loading questions:", error);
+      setQuestions([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Get next unused question
   const getNextQuestion = () => {
     const availableQuestions = questions.filter(
       (q) => !usedQuestionIds.has(q.id)
     );
 
     if (availableQuestions.length === 0) {
-      // Barcha savollar tugadi
       setCurrentPage("result");
       setTestStarted(false);
       return null;
     }
 
-    // Random savol tanlash
     const randomIndex = Math.floor(Math.random() * availableQuestions.length);
     const selectedQuestion = availableQuestions[randomIndex];
 
-    // Ishlatilgan savollar ro'yxatiga qo'shish
     setUsedQuestionIds((prev) => new Set([...prev, selectedQuestion.id]));
 
     return selectedQuestion;
   };
 
-  // Timer effect
   useEffect(() => {
     if (testStarted && timeLeft > 0 && currentPage === "test") {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && currentPage === "test") {
-      // Vaqt tugadi
       setCurrentPage("result");
       setTestStarted(false);
     }
   }, [timeLeft, testStarted, currentPage]);
 
   const startTest = async () => {
-    // Savollarni yuklash
     await loadQuestions();
 
-    // Test boshlash
     setCurrentPage("test");
     setTestStarted(true);
     setScore(0);
@@ -172,7 +163,9 @@ export default function WordBottleApp(): JSX.Element {
   const selectAnswer = (selectedIndex: number) => {
     if (!currentQuestion) return;
 
-    const isCorrect = selectedIndex === currentQuestion.correct;
+    const isCorrect =
+      selectedIndex ===
+      currentQuestion.options.findIndex((opt) => opt.is_correct);
 
     if (isCorrect) {
       setScore(score + 1);
@@ -210,8 +203,36 @@ export default function WordBottleApp(): JSX.Element {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading questions...</div>
+      <div className="relative overflow-hidden min-h-screen bg-white flex items-center justify-center p-3">
+        <div className="absolute top-3 start-3 end-3 bottom-3 p-3 rounded-2xl bg-[#A42FC1]">
+          {/* Decorative circles */}
+          <div className="absolute top-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute bottom-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute top-1 start-44 w-20 h-20 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute bottom-3 start-64 w-20 h-20 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute -bottom-5 start-24 w-20 h-20 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute top-15 -end-5 w-17 h-17 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute bottom-36 end-5 w-20 h-20 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute top-80 start-1 w-17 h-17 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute top-96 -end-5 w-17 h-17 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute top-5 end-56 w-10 h-10 rounded-full bg-white/10 z-10"></div>
+          <div className="absolute bottom-44 start-10 w-10 h-10 rounded-full bg-white/10 z-10"></div>
+
+          {/* Loading content */}
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="w-full max-w-sm mx-auto text-center bg-white rounded-2xl p-8 shadow-2xl">
+              {/* Loading spinner */}
+              <div className="flex justify-center mb-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A42FC1]"></div>
+              </div>
+
+              <h2 className="text-xl font-semibold text-[#A42FC1] mb-2">
+                Loading...
+              </h2>
+              <p className="text-gray-600 text-sm">Fetching your information</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

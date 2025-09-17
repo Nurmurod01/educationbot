@@ -37,28 +37,23 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("🔍 useEffect triggered, user:", user);
-
-    // Agar user yo'q bo'lsa yoki user.id yo'q bo'lsa
-    // if (!user || !user.id) {
-    //   setLoading(false);
-    //   setError("User ma'lumotlari topilmadi");
-    //   return;
-    // }
+    if (!user || !user.id) {
+      setLoading(false);
+      setError("User ma'lumotlari topilmadi");
+      return;
+    }
 
     const fetchData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // To'g'ri user.id ishlatish kerak
-        const apiUrl = `http://49.13.163.83:8083/api/user-info/822245102`;
+        const apiUrl = `http://49.13.163.83:8083/api/user-info/${user.id}`;
 
         const res = await axios.get<UserInfo>(apiUrl);
 
         setData(res.data);
       } catch (err: any) {
-      
         let errorMessage = "Failed to load user information";
         if (err.response) {
           errorMessage += `: ${err.response.status} - ${
@@ -76,23 +71,19 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
       }
     };
 
-    // Kichik delay qo'shib debug qilish uchun
     const timer = setTimeout(() => {
       fetchData();
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [user?.id]); // Dependency array to'g'ri
+  }, [user?.id]); 
 
-  // Debug ma'lumotlari
-  console.log("🎯 Current state:", { loading, error, data, user }); // user.id o'zgarganida fetch qiladi, data dependency olib tashlandi
+  console.log("🎯 Current state:", { loading, error, data, user }); 
 
-  // Loading holatini ko'rsatish
   if (loading) {
     return (
       <div className="relative overflow-hidden min-h-screen bg-white flex items-center justify-center p-3">
         <div className="absolute top-3 start-3 end-3 bottom-3 p-3 rounded-2xl bg-[#A42FC1]">
-          {/* Decorative circles */}
           <div className="absolute top-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
           <div className="absolute bottom-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
           <div className="absolute top-1 start-44 w-20 h-20 rounded-full bg-white/10 z-10"></div>
@@ -105,10 +96,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
           <div className="absolute top-5 end-56 w-10 h-10 rounded-full bg-white/10 z-10"></div>
           <div className="absolute bottom-44 start-10 w-10 h-10 rounded-full bg-white/10 z-10"></div>
 
-          {/* Loading content */}
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-full max-w-sm mx-auto text-center bg-white rounded-2xl p-8 shadow-2xl">
-              {/* Loading spinner */}
               <div className="flex justify-center mb-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A42FC1]"></div>
               </div>
@@ -124,12 +113,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
     );
   }
 
-  // Error holatini ko'rsatish
   if (error) {
     return (
       <div className="relative overflow-hidden min-h-screen bg-white flex items-center justify-center p-3">
         <div className="absolute top-3 start-3 end-3 bottom-3 p-3 rounded-2xl bg-[#A42FC1]">
-          {/* Decorative circles */}
           <div className="absolute top-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
           <div className="absolute bottom-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
           <div className="absolute top-1 start-44 w-20 h-20 rounded-full bg-white/10 z-10"></div>

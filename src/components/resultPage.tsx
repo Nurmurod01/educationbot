@@ -14,7 +14,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   home,
   onrestart,
 }) => {
-  const finalScore = score * 2; // Har bir to'g'ri javob uchun 2 ball
+  const finalScore = score; // Har bir to'g'ri javob uchun 2 ball
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">

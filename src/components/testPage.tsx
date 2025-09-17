@@ -1,15 +1,9 @@
+import { ApiQuestion } from "@/app/page";
 import { ChevronLeft, Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correct: number;
-}
-
 interface TestScreenProps {
-  question: Question;
+  question: ApiQuestion;
   timeLeft: number;
   totalAnswered: number;
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
@@ -57,7 +51,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
     setSelectedAnswer(selectedIndex);
     setShowFeedback(true);
 
-    const isCorrect = selectedIndex === question.correct;
+    // Find correct answer using the new API structure
+    const isCorrect = question.options[selectedIndex].is_correct;
+
     if (isCorrect) {
       setFeedbackText("+2");
       setTimeLeft((prev) => prev + 2);
@@ -82,7 +78,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
           "absolute top-[18px] end-3 w-5 h-5 border-2 border-[#A42FC1] rounded-full flex items-center justify-center",
       };
 
-    const isCorrect = index === question.correct;
+    const isCorrect = question.options[index].is_correct;
     const isSelected = index === selectedAnswer;
 
     if (isCorrect) {
@@ -163,7 +159,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-800 leading-relaxed">
-              {question.question}
+              {question.word}
             </h2>
           </div>
         </div>
@@ -174,14 +170,14 @@ const TestScreen: React.FC<TestScreenProps> = ({
             const iconStyle = getIconStyle(index);
             return (
               <button
-                key={index}
+                key={option.id}
                 onClick={() => handleAnswerSelect(index)}
                 className="relative w-full bg-white border-2 border-[#A42FC1] rounded-2xl p-4 text-left active:bg-blue-50 active:border-blue-400 transition-colors duration-200"
                 disabled={showFeedback}
               >
                 <div className="flex items-center">
                   <p className="text-base font-medium text-gray-800">
-                    {option}
+                    {option.option}
                   </p>
                 </div>
                 <div className={iconStyle.containerClass}>
