@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Charge, Coins, PlayBtn } from "./image";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface TelegramUser {
   id: number;
@@ -53,15 +53,18 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
         const res = await axios.get<UserInfo>(apiUrl);
 
         setData(res.data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         let errorMessage = "Failed to load user information";
-        if (err.response) {
-          errorMessage += `: ${err.response.status} - ${
-            err.response.data || err.message
-          }`;
-        } else if (err.request) {
-          errorMessage += ": Network error";
-        } else {
+
+        if (err instanceof AxiosError) {
+          if (err.response) {
+            errorMessage += `: ${err.response.status} - ${err.response.data}`;
+          } else if (err.request) {
+            errorMessage += ": Network error";
+          } else {
+            errorMessage += `: ${err.message}`;
+          }
+        } else if (err instanceof Error) {
           errorMessage += `: ${err.message}`;
         }
 
@@ -76,9 +79,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [user?.id]); 
+  }, [user?.id]);
 
-  console.log("🎯 Current state:", { loading, error, data, user }); 
+  console.log("🎯 Current state:", { loading, error, data, user });
 
   if (loading) {
     return (
