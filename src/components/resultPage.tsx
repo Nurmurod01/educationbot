@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Home, Return } from "./image";
 import React, { useEffect } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { TelegramUser } from "@/app/page";
 
 interface ResultScreenProps {
@@ -30,24 +30,27 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   useEffect(() => {
     const sendData = async () => {
       try {
-        const res = await axios.post(
-          "https://api.pravaol.uz/api/user/add-coin",
-          {
-            user_id: user?.id,
-            amount: score,
+        await axios.post("https://api.pravaol.uz/api/user/add-coin", {
+          user_id: user?.id,
+          amount: score,
+        });
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (error.response?.data) {
+            console.error("Serverdan xatolik:", error.response.data);
+          } else {
+            console.error("Xatolik:", error.message);
           }
-        );
-      } catch (error: any) {
-        if (error.response?.data) {
-          console.error("Serverdan xatolik:", error.response.data);
-        } else {
+        } else if (error instanceof Error) {
           console.error("Xatolik:", error.message);
+        } else {
+          console.error("Noma'lum xatolik:", error);
         }
       }
     };
 
     sendData();
-  }, []);
+  }, [user?.id, score]);
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">
