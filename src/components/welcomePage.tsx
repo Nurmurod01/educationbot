@@ -37,12 +37,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // if (!user || !user.id) {
-    //   setLoading(false);
-    //   setError("Siz telegramdan kirmadingiz!");
-    //   return;
-    // }
-    const userID = user?.id || 822245102;
+    if (!user || !user.id) {
+      setLoading(false);
+      setError("Siz telegramdan kirmadingiz!");
+      return;
+    }
+    const userID = user?.id;
     const fetchData = async () => {
       setLoading(true);
       setError(null);

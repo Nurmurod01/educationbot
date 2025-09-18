@@ -60,6 +60,8 @@ declare global {
     initDataUnsafe: {
       user?: TelegramWebAppUser;
     };
+    ready: () => void;
+    expand?: () => void;
   }
 
   interface Window {
@@ -89,6 +91,13 @@ export default function WordBottleApp(): JSX.Element {
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
       setUser(tg.initDataUnsafe.user);
+    }
+    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      if (typeof tg.expand === "function") {
+        tg.expand(); // to‘liq ekran
+      }
     }
   }, []);
 
