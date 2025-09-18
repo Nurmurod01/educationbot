@@ -37,12 +37,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user.id) {
-      setLoading(false);
-      setError("Siz telegramdan kirmadingiz!");
-      return;
-    }
-    const userID = user?.id;
+    // if (!user || !user.id) {
+    //   setLoading(false);
+    //   setError("Siz telegramdan kirmadingiz!");
+    //   return;
+    // }
+    const userID = user?.id || 822245102;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -68,7 +68,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartTest, user }) => {
           errorMessage += `: ${err.message}`;
         }
 
-        setError(errorMessage + err);
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
