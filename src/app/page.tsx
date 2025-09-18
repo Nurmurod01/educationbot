@@ -96,12 +96,12 @@ export default function WordBottleApp(): JSX.Element {
       const tg = window.Telegram.WebApp;
       tg.ready();
       if (typeof tg.expand === "function") {
-        tg.expand(); // to‘liq ekran
+        tg.expand(); // to'liq ekran
       }
     }
   }, []);
 
-  const loadQuestions = async () => {
+  const loadQuestions = async (): Promise<ApiQuestion[]> => {
     const userId = user?.id;
 
     setLoading(true);
@@ -113,24 +113,31 @@ export default function WordBottleApp(): JSX.Element {
       if (questionsRes.ok) {
         const apiQuestions: ApiQuestion[] = await questionsRes.json();
         setQuestions(apiQuestions);
+        return apiQuestions; // Return qilamiz
       } else {
         console.warn("Questions endpoint not available, using fallback");
         setQuestions([]);
+        return []; // Bo'sh array qaytaramiz
       }
     } catch (error) {
       console.error("Error loading questions:", error);
       setQuestions([]);
+      return []; // Xatolik holatida bo'sh array
     } finally {
       setLoading(false);
     }
   };
 
-  const getNextQuestion = () => {
-    const availableQuestions = questions.filter(
+  const getNextQuestion = (questionsArray: ApiQuestion[] = questions) => {
+    // Parameter sifatida questions arrayini olish
+    const availableQuestions = questionsArray.filter(
       (q) => !usedQuestionIds.has(q.id)
     );
 
+    console.log("Available questions:", availableQuestions.length); // Debug uchun
+
     if (availableQuestions.length === 0) {
+      console.log("No more questions, going to result page"); // Debug uchun
       setCurrentPage("result");
       setTestStarted(false);
       return null;
@@ -155,18 +162,44 @@ export default function WordBottleApp(): JSX.Element {
   }, [timeLeft, testStarted, currentPage]);
 
   const startTest = async () => {
-    await loadQuestions();
+    // Avval loading holatiga o'tkazamiz
+    setLoading(true);
 
-    setCurrentPage("test");
-    setTestStarted(true);
-    setScore(0);
-    setTotalAnswered(0);
-    setTimeLeft(20);
-    setUsedQuestionIds(new Set());
+    try {
+      // Questions yuklab olamiz va natijani kutamiz
+      const loadedQuestions = await loadQuestions();
 
-    // Birinchi savolni olish
-    const firstQuestion = getNextQuestion();
-    setCurrentQuestion(firstQuestion);
+      console.log("Loaded questions count:", loadedQuestions.length); // Debug uchun
+
+      // Agar savollar yuklanmagan bo'lsa, xabar ko'rsatish
+      if (loadedQuestions.length === 0) {
+        alert("Savollar yuklanmadi. Iltimos qayta urinib ko'ring.");
+        setLoading(false);
+        return;
+      }
+
+      // State-larni reset qilamiz
+      setScore(0);
+      setTotalAnswered(0);
+      setTimeLeft(20);
+      setUsedQuestionIds(new Set());
+
+      // Birinchi savolni yuklab olgan questions array bilan olamiz
+      const firstQuestion = getNextQuestion(loadedQuestions);
+
+      if (firstQuestion) {
+        setCurrentQuestion(firstQuestion);
+        setCurrentPage("test");
+        setTestStarted(true);
+      } else {
+        alert("Savollar topilmadi.");
+      }
+    } catch (error) {
+      console.error("Error starting test:", error);
+      alert("Test boshlashda xatolik yuz berdi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const selectAnswer = (selectedIndex: number) => {
@@ -182,8 +215,8 @@ export default function WordBottleApp(): JSX.Element {
 
     setTotalAnswered((prev) => prev + 1);
 
-    // Keyingi savolni olish
-    const nextQuestion = getNextQuestion();
+    // Keyingi savolni olish (hozirgi questions state bilan)
+    const nextQuestion = getNextQuestion(questions);
     setCurrentQuestion(nextQuestion);
 
     // Agar savol qolmagan bo'lsa, result sahifasiga o'tish
