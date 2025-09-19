@@ -199,11 +199,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
           <button
             onClick={onStartTest}
-            className={`relative z-20 flex justify-center items-center font-bold rounded-full h-28 w-28 shadow-lg transition-transform duration-200 opacity-0 animate-fade-in-delay
+            className={`relative z-20 flex justify-center items-center font-bold rounded-full h-28 w-28 shadow-lg 
             ${
               loading || limitReached
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-white text-[#A42FC1] hover:scale-105"
+                : "bg-white text-[#A42FC1] hover:scale-105 transition-transform duration-200 opacity-0 animate-fade-in-delay"
             }`}
             disabled={loading || limitReached}
           >
