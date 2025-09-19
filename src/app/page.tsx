@@ -169,7 +169,18 @@ export default function WordBottleApp(): JSX.Element {
       setTestStarted(false);
     }
   }, [timeLeft, testStarted, currentPage]);
-
+  useEffect(() => {
+    if (limitReached) {
+      const timer = setTimeout(() => {
+        setPopup(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    const fetchQuestions = async () => {
+      await loadQuestions();
+    };
+    fetchQuestions();
+  }, []);
   const startTest = async () => {
     // Avval loading holatiga o'tkazamiz
     setLoading(true);
@@ -292,7 +303,7 @@ export default function WordBottleApp(): JSX.Element {
     return (
       <div className="relative">
         {popup && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50">
+          <div className="absolute top-0 left-1/2 text-center -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50 animate-fade-out duration-500">
             {popup}
           </div>
         )}
