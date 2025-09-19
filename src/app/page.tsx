@@ -303,7 +303,7 @@ export default function WordBottleApp(): JSX.Element {
     return (
       <div className="relative">
         {popup && (
-          <div className="absolute top-0 left-1/2 text-center -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50 animate-fade-out duration-500">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 text-center bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50 animate-fade-out">
             <h1 className="w-full">{popup}</h1>
           </div>
         )}
