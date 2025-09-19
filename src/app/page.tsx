@@ -87,6 +87,9 @@ export default function WordBottleApp(): JSX.Element {
   const [user, setUser] = useState<TelegramUser | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [limitReached, setLimitReached] = useState(false);
+  const [popup, setPopup] = useState<string | null>(null);
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
@@ -107,9 +110,15 @@ export default function WordBottleApp(): JSX.Element {
     setLoading(true);
     try {
       const questionsRes = await fetch(
-        `https://api.pravaol.uz/api/quiz/${userId}`
+        `https://api.octava-edu.uz/api/quiz/${userId}`
       );
 
+      if (questionsRes.status === 450) {
+        // 🔴 Limit tugagan
+        setLimitReached(true);
+        setPopup("Sizning limitiz tugadi!");
+        return [];
+      }
       if (questionsRes.ok) {
         const apiQuestions: ApiQuestion[] = await questionsRes.json();
         setQuestions(apiQuestions);
@@ -280,7 +289,21 @@ export default function WordBottleApp(): JSX.Element {
   }
 
   if (currentPage === "welcome") {
-    return <WelcomeScreen onStartTest={startTest} user={user} />;
+    return (
+      <div className="relative">
+        {popup && (
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50">
+            {popup}
+          </div>
+        )}
+        <WelcomeScreen
+          onStartTest={startTest}
+          user={user}
+          limitReached={limitReached}
+        />
+        ;
+      </div>
+    );
   }
 
   if (currentPage === "test" && currentQuestion) {

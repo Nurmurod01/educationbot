@@ -30,7 +30,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   useEffect(() => {
     const sendData = async () => {
       try {
-        await axios.post("https://api.pravaol.uz/api/user/add-coin", {
+        await axios.post("https://api.octava-edu.uz/api/user/add-coin", {
           user_id: user?.id,
           amount: score,
         });
