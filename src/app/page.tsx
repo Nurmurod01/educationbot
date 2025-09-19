@@ -116,7 +116,7 @@ export default function WordBottleApp(): JSX.Element {
       if (questionsRes.status === 450) {
         // 🔴 Limit tugagan
         setLimitReached(true);
-        setPopup("Sizning limitiz tugadi!");
+        setPopup("Sizning limitiz tugadi!\nErtaga sinab ko'ring");
         return [];
       }
       if (questionsRes.ok) {
