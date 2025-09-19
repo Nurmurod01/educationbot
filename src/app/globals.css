@@ -167,11 +167,11 @@
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.8s ease-out forwards;
-}
 .animate-fade-out {
   animation: fade-out 0.8s ease-out forwards;
+}
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
 }
 
 .animate-fade-in-delay {

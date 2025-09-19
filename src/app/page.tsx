@@ -169,6 +169,7 @@ export default function WordBottleApp(): JSX.Element {
       setTestStarted(false);
     }
   }, [timeLeft, testStarted, currentPage]);
+
   useEffect(() => {
     if (limitReached) {
       const timer = setTimeout(() => {
@@ -181,6 +182,7 @@ export default function WordBottleApp(): JSX.Element {
     };
     fetchQuestions();
   }, []);
+
   const startTest = async () => {
     // Avval loading holatiga o'tkazamiz
     setLoading(true);
@@ -191,14 +193,12 @@ export default function WordBottleApp(): JSX.Element {
 
       console.log("Loaded questions count:", loadedQuestions.length); // Debug uchun
 
-      // Agar savollar yuklanmagan bo'lsa, xabar ko'rsatish
       if (loadedQuestions.length === 0) {
         alert("Savollar yuklanmadi. Iltimos qayta urinib ko'ring.");
         setLoading(false);
         return;
       }
 
-      // State-larni reset qilamiz
       setScore(0);
       setTotalAnswered(0);
       setTimeLeft(20);
@@ -304,7 +304,7 @@ export default function WordBottleApp(): JSX.Element {
       <div className="relative">
         {popup && (
           <div className="absolute top-0 left-1/2 text-center -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50 animate-fade-out duration-500">
-            {popup}
+            <h1 className="w-full">{popup}</h1>
           </div>
         )}
         <WelcomeScreen
