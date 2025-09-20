@@ -201,7 +201,7 @@ export default function WordBottleApp(): JSX.Element {
 
       setScore(0);
       setTotalAnswered(0);
-      setTimeLeft(20);
+      setTimeLeft(10);
       setUsedQuestionIds(new Set());
 
       // Birinchi savolni yuklab olgan questions array bilan olamiz
