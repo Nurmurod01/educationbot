@@ -132,7 +132,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
                 className="absolute inset-0 rounded-full transition-all"
                 style={{
                   background: `conic-gradient(#A42FC1 ${
-                    (animatedProgress / 20) * 360
+                    (animatedProgress / 10) * 360
                   }deg, #e5e7eb 0deg)`,
                 }}
               ></div>
