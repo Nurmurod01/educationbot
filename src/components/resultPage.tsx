@@ -30,7 +30,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       setUser(tg.initDataUnsafe.user);
     }
   }, []);
+  const soundCache: Record<string, HTMLAudioElement> = {};
 
+  // Helper function: audio ni cache ga olish
+  const getCachedAudio = (path: string) => {
+    if (!soundCache[path]) {
+      soundCache[path] = new Audio(path);
+      soundCache[path].volume = 0.5; // umumiy volume
+    }
+    return soundCache[path];
+  };
   useEffect(() => {
     const sendData = async () => {
       // Agar practice mode bo'lsa, coin qo'shmaslik
@@ -41,10 +50,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
       try {
         const soundEnabled = localStorage.getItem("sound");
         if (soundEnabled === null || JSON.parse(soundEnabled) !== false) {
-          const audio = new Audio(`/sound/completed.mp3`);
-          audio.volume = 0.5;
+          const audio = getCachedAudio("/sound/completed.mp3");
+
+          // qayta o'ynash uchun boshidan qo'yamiz
+          audio.currentTime = 0;
+
           audio.play().catch((error) => {
-            console.error(`Error playing sound:`, error);
+            console.error("Error playing sound:", error);
           });
         }
       } catch (error) {
