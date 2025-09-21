@@ -9,6 +9,7 @@ interface TestScreenProps {
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
   onSelectAnswer: (index: number) => void;
   onGoBack: () => void;
+  isPracticeMode?: boolean;
 }
 
 const TestScreen: React.FC<TestScreenProps> = ({
@@ -17,11 +18,31 @@ const TestScreen: React.FC<TestScreenProps> = ({
   setTimeLeft,
   onSelectAnswer,
   onGoBack,
+  isPracticeMode = false,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState<"+2" | "-3" | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(timeLeft);
+
+  // Sound function
+  const playSound = (soundType: "correct" | "wrong") => {
+    try {
+      // Check if sound is enabled in localStorage
+      const soundEnabled = localStorage.getItem("sound");
+      if (soundEnabled === null || JSON.parse(soundEnabled) === false) {
+        return; // Sound is disabled, don't play
+      }
+
+      const audio = new Audio(`/sound/${soundType}.mp3`);
+      audio.volume = 0.5; // Set volume to 50%
+      audio.play().catch((error) => {
+        console.error(`Error playing ${soundType} sound:`, error);
+      });
+    } catch (error) {
+      console.error(`Error with sound system:`, error);
+    }
+  };
 
   useEffect(() => {
     let frame: number;
@@ -57,9 +78,11 @@ const TestScreen: React.FC<TestScreenProps> = ({
     if (isCorrect) {
       setFeedbackText("+2");
       setTimeLeft((prev) => prev + 2);
+      playSound("correct"); // Play correct sound
     } else {
       setFeedbackText("-3");
       setTimeLeft((prev) => Math.max(prev - 3, 0));
+      playSound("wrong"); // Play wrong sound
     }
 
     setTimeout(() => {
@@ -74,8 +97,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
     if (!showFeedback)
       return {
         icon: null,
-        containerClass:
-          "absolute top-[18px] end-3 w-5 h-5 border-2 border-[#A42FC1] rounded-full flex items-center justify-center",
+        containerClass: `absolute top-[18px] end-3 w-5 h-5 border-2 ${
+          isPracticeMode ? "border-orange-500" : "border-[#A42FC1]"
+        } rounded-full flex items-center justify-center`,
       };
 
     const isCorrect = question.options[index].is_correct;
@@ -84,8 +108,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
     if (isCorrect) {
       return {
         icon: <Check className="w-4 h-4 text-white" />,
-        containerClass:
-          "absolute top-[18px] end-3 w-5 h-5 bg-[#A42FC1] border-green-500 rounded-full flex items-center justify-center",
+        containerClass: `absolute top-[18px] end-3 w-5 h-5 ${
+          isPracticeMode ? "bg-orange-500" : "bg-[#A42FC1]"
+        } border-green-500 rounded-full flex items-center justify-center`,
       };
     } else if (isSelected) {
       return {
@@ -105,15 +130,26 @@ const TestScreen: React.FC<TestScreenProps> = ({
   return (
     <div className="relative min-h-screen overflow-hidden to-white p-3">
       <div className="max-w-md mx-auto">
-        <div className="absolute top-0 start-0 end-0 bg-[#A42FC1] h-52 rounded-4xl m-2 -z-10"></div>
+        <div
+          className={`absolute top-0 start-0 end-0 ${
+            isPracticeMode ? "bg-orange-500" : "bg-[#A42FC1]"
+          } h-52 rounded-4xl m-2 -z-10`}
+        ></div>
 
         {/* Header */}
-        <div className="flex justify-start mb-4">
+        <div className="flex justify-between items-center mb-4">
           <div className="flex items-center text-white space-x-2">
             <button onClick={onGoBack} className="p-1">
               <ChevronLeft />
             </button>
           </div>
+
+          {/* Practice Mode Indicator */}
+          {isPracticeMode && (
+            <div className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm font-bold">
+              PRACTICE
+            </div>
+          )}
         </div>
 
         {/* Decorative circles */}
@@ -131,9 +167,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
               <div
                 className="absolute inset-0 rounded-full transition-all"
                 style={{
-                  background: `conic-gradient(#A42FC1 ${
-                    (animatedProgress / 10) * 360
-                  }deg, #e5e7eb 0deg)`,
+                  background: `conic-gradient(${
+                    isPracticeMode ? "#f97316" : "#A42FC1"
+                  } ${(animatedProgress / 10) * 360}deg, #e5e7eb 0deg)`,
                 }}
               ></div>
 
@@ -150,7 +186,11 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
               {/* White center */}
               <div className="absolute w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
-                <span className="text-2xl font-bold text-[#A42FC1]">
+                <span
+                  className={`text-2xl font-bold ${
+                    isPracticeMode ? "text-orange-500" : "text-[#A42FC1]"
+                  }`}
+                >
                   {timeLeft}
                 </span>
               </div>
@@ -172,7 +212,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
               <button
                 key={option.id}
                 onClick={() => handleAnswerSelect(index)}
-                className="relative w-full bg-white border-2 border-[#A42FC1] rounded-2xl p-4 text-left active:bg-blue-50 active:border-blue-400 transition-colors duration-200"
+                className={`relative w-full bg-white border-2 ${
+                  isPracticeMode ? "border-orange-500" : "border-[#A42FC1]"
+                } rounded-2xl p-4 text-left active:bg-blue-50 active:border-blue-400 transition-colors duration-200`}
                 disabled={showFeedback}
               >
                 <div className="flex items-center">

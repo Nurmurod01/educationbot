@@ -10,6 +10,7 @@ interface ResultScreenProps {
   totalAnswered: number;
   home: () => void;
   onrestart: () => void;
+  isPracticeMode?: boolean;
 }
 
 const ResultScreen: React.FC<ResultScreenProps> = ({
@@ -17,9 +18,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   totalAnswered,
   home,
   onrestart,
+  isPracticeMode = false,
 }) => {
   const [user, setUser] = React.useState<TelegramUser | null>(null);
-  const finalScore = score;
+  let bonus = Math.floor(score / 5);
+  const finalScore = score + bonus;
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
@@ -29,11 +33,18 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
 
   useEffect(() => {
     const sendData = async () => {
+      // Agar practice mode bo'lsa, coin qo'shmaslik
+      if (isPracticeMode) {
+        console.log("Practice mode: Coins not added to account");
+        return;
+      }
+
       try {
         await axios.post("https://api.octava-edu.uz/api/user/add-coin", {
           user_id: user?.id,
           amount: score,
         });
+        console.log(`Added ${score} coins to user account`);
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
           if (error.response?.data) {
@@ -50,11 +61,30 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     };
 
     sendData();
-  }, [user?.id, score]);
+
+    // Sound chiqarish (localStorage'dan tekshirib)
+    try {
+      const soundEnabled = localStorage.getItem("sound");
+      if (soundEnabled === null || JSON.parse(soundEnabled) !== false) {
+        const audio = new Audio(`/sound/completed.mp3`);
+        audio.volume = 0.5;
+        audio.play().catch((error) => {
+          console.error(`Error playing sound:`, error);
+        });
+      }
+    } catch (error) {
+      console.error("Sound error:", error);
+    }
+  }, [user?.id, score, isPracticeMode]);
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">
-      <div className="absolute top-3 start-3 end-3 bottom-3 rounded-2xl p-4 bg-[#A42FC1]">
+      <div
+        className={`absolute top-3 start-3 end-3 bottom-3 rounded-2xl p-4 ${
+          isPracticeMode ? "bg-orange-600" : "bg-[#A42FC1]"
+        }`}
+      >
+        {/* Decorative circles */}
         <div className="absolute top-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
         <div className="absolute bottom-12 start-0.5 w-15 h-15 rounded-full bg-white/10 z-10"></div>
         <div className="absolute top-1 start-44 w-20 h-20 rounded-full bg-white/10 z-10"></div>
@@ -67,8 +97,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         <div className="absolute top-5 end-56 w-10 h-10 rounded-full bg-white/10 z-10"></div>
         <div className="absolute bottom-44 start-10 w-10 h-10 rounded-full bg-white/10 z-10"></div>
 
+        {/* Practice Mode Banner */}
+        {isPracticeMode && (
+          <div className="absolute top-5 left-1/2 -translate-x-1/2 z-30">
+            <div className="bg-white/20 text-white px-4 py-2 rounded-lg shadow-lg text-center">
+              <h3 className="font-bold text-sm">PRACTICE MODE</h3>
+              <p className="text-xs">No coins added</p>
+            </div>
+          </div>
+        )}
+
         <div className="w-full bg-white flex flex-col items-center gap-3 mt-44 p-5 rounded-3xl">
-          <h1 className="text-4xl text-[#A42FC1] text-center font-bold tracking-wider">
+          <h1
+            className={`text-4xl ${
+              isPracticeMode ? "text-orange-500" : "text-[#A42FC1]"
+            } text-center font-bold tracking-wider`}
+          >
             Score
           </h1>
           <h1 className="text-3xl text-green-600 font-semibold">
@@ -78,10 +122,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
             {score} / {totalAnswered} correct
           </h1>
 
+          {/* Practice Mode Info */}
+          {isPracticeMode && (
+            <div className="bg-orange-100 border border-orange-300 rounded-lg p-3 mt-2">
+              <p className="text-orange-700 text-sm text-center">
+                🎓 Practice completed! <br />
+                Coins were not added to your account.
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-around items-center gap-12 mt-4">
             <button onClick={onrestart} className="flex flex-col items-center">
               <Image src={Return} alt="Restart" />
-              <span className="text-sm mt-1">Restart</span>
+              <span className="text-sm mt-1">
+                {isPracticeMode ? "Practice Again" : "Restart"}
+              </span>
             </button>
             <button onClick={home} className="flex flex-col items-center">
               <Image src={Home} alt="Home" />

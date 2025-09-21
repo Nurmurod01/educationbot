@@ -90,6 +90,9 @@ export default function WordBottleApp(): JSX.Element {
   const [limitReached, setLimitReached] = useState(false);
   const [popup, setPopup] = useState<string | null>(null);
 
+  const [isPracticeMode, setIsPracticeMode] = useState(false);
+  const [userTryCount, setUserTryCount] = useState<number>(0);
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
@@ -99,7 +102,7 @@ export default function WordBottleApp(): JSX.Element {
       const tg = window.Telegram.WebApp;
       tg.ready();
       if (typeof tg.expand === "function") {
-        tg.expand(); // to'liq ekran
+        tg.expand();
       }
     }
   }, []);
@@ -116,7 +119,9 @@ export default function WordBottleApp(): JSX.Element {
       if (questionsRes.status === 450) {
         // 🔴 Limit tugagan
         setLimitReached(true);
-        setPopup("Sizning limitiz tugadi!\nErtaga sinab ko'ring");
+        setPopup(
+          "Siz bugungi barcha so'zlarni topdingiz!\nSiz zo'rsiz\nErtaga qaytib urunib ko'ring"
+        );
         return [];
       }
       if (questionsRes.ok) {
@@ -182,10 +187,17 @@ export default function WordBottleApp(): JSX.Element {
     };
     fetchQuestions();
   }, []);
-
+  const handleUserInfo = (tryCount: number) => {
+    setUserTryCount(tryCount);
+  };
   const startTest = async () => {
     // Avval loading holatiga o'tkazamiz
     setLoading(true);
+    if (userTryCount <= 0) {
+      setIsPracticeMode(true);
+    } else {
+      setIsPracticeMode(false);
+    }
 
     try {
       // Questions yuklab olamiz va natijani kutamiz
@@ -301,7 +313,7 @@ export default function WordBottleApp(): JSX.Element {
 
   if (currentPage === "welcome") {
     return (
-      <div className="relative">
+      <div className="relative overflow-hidden min-h-screen">
         {popup && (
           <div className="absolute top-0 left-1/2 -translate-x-1/2 text-center bg-red-500 text-white px-4 py-2 rounded-b-lg shadow-lg z-50 animate-fade-out">
             <h1 className="w-full">{popup}</h1>
@@ -311,6 +323,8 @@ export default function WordBottleApp(): JSX.Element {
           onStartTest={startTest}
           user={user}
           limitReached={limitReached}
+          onUserInfoLoaded={handleUserInfo}
+          isPracticeMode={isPracticeMode}
         />
         ;
       </div>
@@ -326,6 +340,7 @@ export default function WordBottleApp(): JSX.Element {
         onSelectAnswer={selectAnswer}
         onGoBack={goBack}
         setTimeLeft={setTimeLeft}
+        isPracticeMode={isPracticeMode}
       />
     );
   }
@@ -337,6 +352,7 @@ export default function WordBottleApp(): JSX.Element {
         totalAnswered={totalAnswered}
         home={restart}
         onrestart={startTest}
+        isPracticeMode={isPracticeMode}
       />
     );
   }
