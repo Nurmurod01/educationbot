@@ -25,17 +25,25 @@ const TestScreen: React.FC<TestScreenProps> = ({
   const [feedbackText, setFeedbackText] = useState<"+2" | "-3" | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(timeLeft);
 
-  // Sound function
+  const soundCache: Record<"correct" | "wrong", HTMLAudioElement> = {
+    correct: new Audio("/sound/correct.mp3"),
+    wrong: new Audio("/sound/wrong.mp3"),
+  };
+
+  soundCache.correct.volume = 0.5;
+  soundCache.wrong.volume = 0.5;
+
   const playSound = (soundType: "correct" | "wrong") => {
     try {
-      // Check if sound is enabled in localStorage
       const soundEnabled = localStorage.getItem("sound");
       if (soundEnabled === null || JSON.parse(soundEnabled) === false) {
-        return; // Sound is disabled, don't play
+        return; // Sound disabled
       }
 
-      const audio = new Audio(`/sound/${soundType}.mp3`);
-      audio.volume = 0.5; // Set volume to 50%
+      const audio = soundCache[soundType];
+
+      // Agar oldin o'ynab tugamagan bo'lsa, boshidan qo'yamiz
+      audio.currentTime = 0;
       audio.play().catch((error) => {
         console.error(`Error playing ${soundType} sound:`, error);
       });
@@ -76,13 +84,13 @@ const TestScreen: React.FC<TestScreenProps> = ({
     const isCorrect = question.options[selectedIndex].is_correct;
 
     if (isCorrect) {
+      playSound("correct"); // Play correct sound
       setFeedbackText("+2");
       setTimeLeft((prev) => prev + 2);
-      playSound("correct"); // Play correct sound
     } else {
+      playSound("wrong"); // Play wrong sound
       setFeedbackText("-3");
       setTimeLeft((prev) => Math.max(prev - 3, 0));
-      playSound("wrong"); // Play wrong sound
     }
 
     setTimeout(() => {

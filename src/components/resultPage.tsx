@@ -38,11 +38,22 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         console.log("Practice mode: Coins not added to account");
         return;
       }
-
+      try {
+        const soundEnabled = localStorage.getItem("sound");
+        if (soundEnabled === null || JSON.parse(soundEnabled) !== false) {
+          const audio = new Audio(`/sound/completed.mp3`);
+          audio.volume = 0.5;
+          audio.play().catch((error) => {
+            console.error(`Error playing sound:`, error);
+          });
+        }
+      } catch (error) {
+        console.error("Sound error:", error);
+      }
       try {
         await axios.post("https://api.octava-edu.uz/api/user/add-coin", {
           user_id: user?.id,
-          amount: score,
+          amount: finalScore,
         });
         console.log(`Added ${score} coins to user account`);
       } catch (error: unknown) {
@@ -61,20 +72,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
     };
 
     sendData();
-
-    // Sound chiqarish (localStorage'dan tekshirib)
-    try {
-      const soundEnabled = localStorage.getItem("sound");
-      if (soundEnabled === null || JSON.parse(soundEnabled) !== false) {
-        const audio = new Audio(`/sound/completed.mp3`);
-        audio.volume = 0.5;
-        audio.play().catch((error) => {
-          console.error(`Error playing sound:`, error);
-        });
-      }
-    } catch (error) {
-      console.error("Sound error:", error);
-    }
   }, [user?.id, score, isPracticeMode]);
 
   return (
