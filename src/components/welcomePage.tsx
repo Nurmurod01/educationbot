@@ -4,7 +4,6 @@ import { Charge, Coins, PlayBtn } from "./image";
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import clsx from "clsx";
-import BatteryGauge from "react-battery-gauge";
 import { usePersistedState } from "./usePresidenthook";
 
 interface TelegramUser {
@@ -208,7 +207,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <div className="absolute top-22 left-1/2 -translate-x-1/2 z-30">
             <div className="bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-pulse">
               <h3 className="font-bold text-sm">PRACTICE MODE</h3>
-              <p className="text-xs">Coins earned won't be added</p>
+              <p className="text-xs">Coins earned won&apost be added</p>
             </div>
           </div>
         )}

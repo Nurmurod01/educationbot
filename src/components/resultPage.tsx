@@ -21,7 +21,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   isPracticeMode = false,
 }) => {
   const [user, setUser] = React.useState<TelegramUser | null>(null);
-  let bonus = Math.floor(score / 5);
+  const bonus = Math.floor(score / 5);
   const finalScore = score + bonus;
 
   useEffect(() => {
