@@ -332,6 +332,7 @@ export default function WordBottleApp(): JSX.Element {
           limitReached={limitReached}
           onUserInfoLoaded={handleUserInfo}
           isPracticeMode={isPracticeMode}
+          setIsPracticeMode={setIsPracticeMode}
         />
         ;
       </div>

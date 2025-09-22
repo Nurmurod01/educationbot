@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Charge, Coins, PlayBtn } from "./image";
+import { Charge, Coins, PlayBtn, WhitePlay } from "./image";
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import clsx from "clsx";
@@ -24,6 +24,7 @@ interface WelcomeScreenProps {
   limitReached: boolean;
   onUserInfoLoaded?: (tryCount: number) => void;
   isPracticeMode?: boolean;
+  setIsPracticeMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface UserInfo {
@@ -43,6 +44,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   limitReached,
   onUserInfoLoaded,
   isPracticeMode = false,
+  setIsPracticeMode,
 }) => {
   const [data, setData] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     //   setError("Siz telegramdan kirmadingiz!");
     //   return;
     // }
-    const userID = user?.id || 822245102;
+    const userID = user?.id ;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -69,7 +71,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         const res = await axios.get<UserInfo>(apiUrl);
 
         setData(res.data);
-
+        if (res.data.try_count <= 0) {
+          setIsPracticeMode(true);
+        } else {
+          setIsPracticeMode(false);
+        }
         if (onUserInfoLoaded) {
           onUserInfoLoaded(res.data.try_count);
         }
@@ -204,7 +210,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
         {/* Practice Mode Banner */}
         {isPracticeMode && (
-          <div className="absolute top-22 left-1/2 -translate-x-1/2 z-30">
+          <div className="absolute top-5 start-32 -translate-x-1/2 z-30">
             <div className="bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-pulse">
               <h3 className="font-bold text-sm">PRACTICE MODE</h3>
               <p className="text-xs">Coins earned won&apost be added</p>
@@ -312,7 +318,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               disabled={loading || limitReached}
             >
               <Image
-                src={PlayBtn}
+                src={isPracticeMode ? WhitePlay : PlayBtn}
                 height={40}
                 width={40}
                 alt="Start Game"
