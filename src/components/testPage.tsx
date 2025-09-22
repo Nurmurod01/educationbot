@@ -26,7 +26,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   const [animatedProgress, setAnimatedProgress] = useState(timeLeft);
   // Shuffle qilingan options ni saqlash uchun state
   const [shuffledOptions, setShuffledOptions] = useState(question.options);
-
+  const [strikeCount, setStrikeCount] = useState(0);
   // Sound cache ni useState bilan yaratish - faqat bir marta
   const [soundCache] = useState<Record<"correct" | "wrong", HTMLAudioElement>>(
     () => {
@@ -59,7 +59,20 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
     return shuffled;
   }
-
+  const words = [
+    "🔥 Hot Streak!",
+    "🌟 Unstoppable! ",
+    "🎯 Perfect Aim!",
+    "🔥 Streak Power! ",
+    "🎉 Combo Bonus! ",
+    "⚡️ Brain Streak! ",
+    "🏆 Champion Streak! ",
+  ];
+  function getRandomWord() {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    return words[randomIndex];
+  }
+  const [randomedWord, setRandomedWord] = useState<string>("");
   // Question o'zgarganda options ni shuffle qilish
   useEffect(() => {
     if (question?.options?.length > 0) {
@@ -108,6 +121,13 @@ const TestScreen: React.FC<TestScreenProps> = ({
     return () => cancelAnimationFrame(frame);
   }, [timeLeft, animatedProgress]);
 
+  useEffect(() => {
+    if (strikeCount == 6) {
+      setStrikeCount(1);
+    }
+    setRandomedWord(getRandomWord());
+  }, [strikeCount]);
+
   const handleAnswerSelect = (selectedIndex: number) => {
     if (showFeedback) return;
 
@@ -120,6 +140,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
     if (isCorrect) {
       playSound("correct"); // Play correct sound
       setFeedbackText("+2");
+      setStrikeCount(strikeCount + 1);
       setTimeLeft((prev) => prev + 2);
     } else {
       playSound("wrong"); // Play wrong sound
@@ -201,9 +222,22 @@ const TestScreen: React.FC<TestScreenProps> = ({
         <div className="absolute top-5 end-56 w-10 h-10 rounded-full bg-white/10 "></div>
 
         {/* Question Card with Timer */}
-        <div className="relative bg-white rounded-xl shadow-lg mx-5 mt-28 mb-6 p-5 pt-6 border border-gray-100">
+        <div className="relative bg-white  rounded-xl shadow-lg mx-5 mt-28 mb-6 p-5 pt-6 border border-gray-100">
           <div className="absolute -top-11 left-1/2 w-[68px] h-[68px] bg-white rounded-full transform -translate-x-1/2"></div>
+          {showFeedback && feedbackText && (
+            <div
+              className={`absolute w-full pe-10 -top-17 text-center text-xl font-bold ${
+                feedbackText === "+2" ? "text-green-500" : "text-red-500"
+              } animate-bounce`}
+            >
+              <span className="mr-2">
+                {strikeCount === 5 ? randomedWord : ""}{" "}
+                <span>{feedbackText}</span>
+              </span>
+            </div>
+          )}
           <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
+            {/* Feedback animation */}
             <div className="relative w-15 h-15 rounded-full flex items-center justify-center">
               {/* Progress ring */}
               <div
@@ -214,17 +248,6 @@ const TestScreen: React.FC<TestScreenProps> = ({
                   } ${(animatedProgress / 10) * 360}deg, #e5e7eb 0deg)`,
                 }}
               ></div>
-
-              {/* Feedback animation */}
-              {showFeedback && feedbackText && (
-                <div
-                  className={`absolute -top-8 text-xl font-bold ${
-                    feedbackText === "+2" ? "text-green-500" : "text-red-500"
-                  } animate-bounce`}
-                >
-                  {feedbackText}
-                </div>
-              )}
 
               {/* White center */}
               <div className="absolute w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
