@@ -7,18 +7,22 @@ interface TestScreenProps {
   timeLeft: number;
   totalAnswered: number;
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
-  onSelectAnswer: (index: number) => void;
   onGoBack: () => void;
   isPracticeMode?: boolean;
+  setScore: React.Dispatch<React.SetStateAction<number>>;
+  score: number;
+  handleSelectAnswer: () => void;
 }
 
 const TestScreen: React.FC<TestScreenProps> = ({
   question,
   timeLeft,
   setTimeLeft,
-  onSelectAnswer,
   onGoBack,
   isPracticeMode = false,
+  score,
+  handleSelectAnswer,
+  setScore,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -60,9 +64,9 @@ const TestScreen: React.FC<TestScreenProps> = ({
     return shuffled;
   }
   const words = [
-    "🔥 Hot Streak!",
+    "🔥 Hot Streak! ",
     "🌟 Unstoppable! ",
-    "🎯 Perfect Aim!",
+    "🎯 Perfect Aim! ",
     "🔥 Streak Power! ",
     "🎉 Combo Bonus! ",
     "⚡️ Brain Streak! ",
@@ -122,11 +126,8 @@ const TestScreen: React.FC<TestScreenProps> = ({
   }, [timeLeft, animatedProgress]);
 
   useEffect(() => {
-    if (strikeCount == 6) {
-      setStrikeCount(1);
-    }
     setRandomedWord(getRandomWord());
-  }, [strikeCount]);
+  }, []);
 
   const handleAnswerSelect = (selectedIndex: number) => {
     if (showFeedback) return;
@@ -134,25 +135,26 @@ const TestScreen: React.FC<TestScreenProps> = ({
     setSelectedAnswer(selectedIndex);
     setShowFeedback(true);
 
-    // Shuffled options ichidan to'g'ri javobni topish
     const isCorrect = shuffledOptions[selectedIndex].is_correct;
 
     if (isCorrect) {
       playSound("correct"); // Play correct sound
       setFeedbackText("+2");
+      setScore(score + 1);
       setStrikeCount(strikeCount + 1);
       setTimeLeft((prev) => prev + 2);
     } else {
-      playSound("wrong"); // Play wrong sound
+      playSound("wrong");
       setFeedbackText("-3");
+      setStrikeCount(0);
       setTimeLeft((prev) => Math.max(prev - 3, 0));
     }
 
     setTimeout(() => {
       setShowFeedback(false);
       setSelectedAnswer(null);
+      handleSelectAnswer();
       setFeedbackText(null);
-      onSelectAnswer(selectedIndex);
     }, 800);
   };
 
@@ -224,18 +226,16 @@ const TestScreen: React.FC<TestScreenProps> = ({
         {/* Question Card with Timer */}
         <div className="relative bg-white  rounded-xl shadow-lg mx-5 mt-28 mb-6 p-5 pt-6 border border-gray-100">
           <div className="absolute -top-11 left-1/2 w-[68px] h-[68px] bg-white rounded-full transform -translate-x-1/2"></div>
-          {showFeedback && feedbackText && (
-            <div
-              className={`absolute w-full pe-10 -top-17 text-center text-xl font-bold ${
-                feedbackText === "+2" ? "text-green-500" : "text-red-500"
-              } animate-bounce`}
-            >
-              <span className="mr-2">
-                {strikeCount === 5 ? randomedWord : ""}{" "}
-                <span>{feedbackText}</span>
-              </span>
-            </div>
-          )}
+          <div
+            className={`absolute w-full pe-10 -top-17 text-center text-xl font-bold ${
+              feedbackText === "+2" ? "text-green-500" : "text-red-500"
+            } animate-bounce`}
+          >
+            <span className="mr-2 text-green-500">
+              {strikeCount >= 5 ? randomedWord : ""}
+            </span>
+            <span>{feedbackText}</span>
+          </div>
           <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
             {/* Feedback animation */}
             <div className="relative w-15 h-15 rounded-full flex items-center justify-center">

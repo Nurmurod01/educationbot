@@ -114,7 +114,7 @@ export default function WordBottleApp(): JSX.Element {
   }, []);
 
   const loadQuestions = async (): Promise<ApiQuestion[]> => {
-    const userId = user?.id;
+    const userId = user?.id || 822245102;
 
     setLoading(true);
     try {
@@ -242,16 +242,8 @@ export default function WordBottleApp(): JSX.Element {
     }
   };
 
-  const selectAnswer = (selectedIndex: number) => {
+  const selectAnswer = () => {
     if (!currentQuestion) return;
-
-    const isCorrect =
-      selectedIndex ===
-      currentQuestion.options.findIndex((opt) => opt.is_correct);
-
-    if (isCorrect) {
-      setScore(score + 1);
-    }
 
     setTotalAnswered((prev) => prev + 1);
 
@@ -348,10 +340,12 @@ export default function WordBottleApp(): JSX.Element {
         question={currentQuestion}
         timeLeft={timeLeft}
         totalAnswered={totalAnswered}
-        onSelectAnswer={selectAnswer}
         onGoBack={goBack}
         setTimeLeft={setTimeLeft}
         isPracticeMode={isPracticeMode}
+        setScore={setScore}
+        handleSelectAnswer={selectAnswer}
+        score={score}
       />
     );
   }
