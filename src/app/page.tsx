@@ -114,7 +114,7 @@ export default function WordBottleApp(): JSX.Element {
   }, []);
 
   const loadQuestions = async (): Promise<ApiQuestion[]> => {
-    const userId = user?.id || 822245102;
+    const userId = user?.id;
 
     setLoading(true);
     try {

@@ -56,11 +56,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   );
 
   useEffect(() => {
-    // if (!user || !user.id) {
-    //   setLoading(false);
-    //   setError("Siz telegramdan kirmadingiz!");
-    //   return;
-    // }
+    if (!user || !user.id) {
+      setLoading(false);
+      setError("Siz telegramdan kirmadingiz!");
+      return;
+    }
     const userID = user?.id ;
     const fetchData = async () => {
       setLoading(true);
