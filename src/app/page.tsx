@@ -6,6 +6,7 @@ import TestScreen from "@/components/testPage";
 
 import { useState, useEffect } from "react";
 import WelcomeScreen from "@/components/welcomePage";
+import { usePersistedState } from "@/components/usePresidenthook";
 
 // API Question interface
 export interface ApiQuestion {
@@ -93,6 +94,11 @@ export default function WordBottleApp(): JSX.Element {
   const [isPracticeMode, setIsPracticeMode] = useState(false);
   const [userTryCount, setUserTryCount] = useState<number>(0);
 
+  const [swap, setSwap] = usePersistedState<"eng-uzb" | "uzb-eng">(
+    "swap",
+    "eng-uzb"
+  );
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
@@ -113,11 +119,12 @@ export default function WordBottleApp(): JSX.Element {
     setLoading(true);
     try {
       const questionsRes = await fetch(
-        `https://api.octava-edu.uz/api/quiz/${userId}`
+        `https://api.octava-edu.uz/api/quiz/${userId}/is_swap=${
+          swap === "eng-uzb" ? 0 : 1
+        }`
       );
 
       if (questionsRes.status === 450) {
-        // 🔴 Limit tugagan
         setLimitReached(true);
         setPopup(
           "Siz bugungi barcha so'zlarni topdingiz!\nSiz zo'rsiz\nErtaga qaytib urunib ko'ring"

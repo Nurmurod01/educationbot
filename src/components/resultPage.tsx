@@ -32,17 +32,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
   }, []);
   const soundCache: Record<string, HTMLAudioElement> = {};
 
-  // Helper function: audio ni cache ga olish
   const getCachedAudio = (path: string) => {
     if (!soundCache[path]) {
       soundCache[path] = new Audio(path);
-      soundCache[path].volume = 0.5; // umumiy volume
+      soundCache[path].volume = 0.5;
     }
     return soundCache[path];
   };
   useEffect(() => {
     const sendData = async () => {
-      // Agar practice mode bo'lsa, coin qo'shmaslik
       if (isPracticeMode) {
         console.log("Practice mode: Coins not added to account");
         return;
@@ -52,7 +50,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({
         if (soundEnabled === null || JSON.parse(soundEnabled) !== false) {
           const audio = getCachedAudio("/sound/completed.mp3");
 
-          // qayta o'ynash uchun boshidan qo'yamiz
           audio.currentTime = 0;
 
           audio.play().catch((error) => {
