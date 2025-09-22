@@ -114,7 +114,7 @@ export default function WordBottleApp(): JSX.Element {
   }, []);
 
   const loadQuestions = async (): Promise<ApiQuestion[]> => {
-    const userId = user?.id;
+    const userId = user?.id || 822245102;
 
     setLoading(true);
     try {
@@ -205,6 +205,7 @@ export default function WordBottleApp(): JSX.Element {
     } else {
       setIsPracticeMode(false);
     }
+    console.log(swap);
 
     try {
       // Questions yuklab olamiz va natijani kutamiz
@@ -333,6 +334,8 @@ export default function WordBottleApp(): JSX.Element {
           onUserInfoLoaded={handleUserInfo}
           isPracticeMode={isPracticeMode}
           setIsPracticeMode={setIsPracticeMode}
+          swap={swap}
+          setSwap={setSwap}
         />
         ;
       </div>

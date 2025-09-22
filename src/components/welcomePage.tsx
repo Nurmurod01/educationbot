@@ -25,6 +25,8 @@ interface WelcomeScreenProps {
   onUserInfoLoaded?: (tryCount: number) => void;
   isPracticeMode?: boolean;
   setIsPracticeMode: React.Dispatch<React.SetStateAction<boolean>>;
+  swap: "eng-uzb" | "uzb-eng";
+  setSwap: React.Dispatch<React.SetStateAction<"eng-uzb" | "uzb-eng">>;
 }
 
 export interface UserInfo {
@@ -45,23 +47,21 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onUserInfoLoaded,
   isPracticeMode = false,
   setIsPracticeMode,
+  swap,
+  setSwap,
 }) => {
   const [data, setData] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sound, setSound] = usePersistedState<boolean>("sound", true);
-  const [swap, setSwap] = usePersistedState<"eng-uzb" | "uzb-eng">(
-    "swap",
-    "eng-uzb"
-  );
 
   useEffect(() => {
-    if (!user || !user.id) {
-      setLoading(false);
-      setError("Siz telegramdan kirmadingiz!");
-      return;
-    }
-    const userID = user?.id ;
+    // if (!user || !user.id) {
+    //   setLoading(false);
+    //   setError("Siz telegramdan kirmadingiz!");
+    //   return;
+    // }
+    const userID = user?.id || 822245102;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
