@@ -114,12 +114,12 @@ export default function WordBottleApp(): JSX.Element {
   }, []);
 
   const loadQuestions = async (): Promise<ApiQuestion[]> => {
-    const userId = user?.id;
+    const userId = user?.id || 822245102;
 
     setLoading(true);
     try {
       const questionsRes = await fetch(
-        `https://api.octava-edu.uz/api/quiz/${userId}/is_swap=${
+        `https://api.octava-edu.uz/api/quiz/${userId}?is_swap=${
           swap === "eng-uzb" ? 0 : 1
         }`
       );

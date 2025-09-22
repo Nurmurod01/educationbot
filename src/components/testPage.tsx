@@ -24,14 +24,48 @@ const TestScreen: React.FC<TestScreenProps> = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState<"+2" | "-3" | null>(null);
   const [animatedProgress, setAnimatedProgress] = useState(timeLeft);
+  // Shuffle qilingan options ni saqlash uchun state
+  const [shuffledOptions, setShuffledOptions] = useState(question.options);
 
-  const soundCache: Record<"correct" | "wrong", HTMLAudioElement> = {
-    correct: new Audio("/sound/correct.mp3"),
-    wrong: new Audio("/sound/wrong.mp3"),
-  };
+  // Sound cache ni useState bilan yaratish - faqat bir marta
+  const [soundCache] = useState<Record<"correct" | "wrong", HTMLAudioElement>>(
+    () => {
+      const cache = {
+        correct: new Audio("/sound/correct.mp3"),
+        wrong: new Audio("/sound/wrong.mp3"),
+      };
 
-  soundCache.correct.volume = 0.5;
-  soundCache.wrong.volume = 0.5;
+      cache.correct.volume = 0.5;
+      cache.wrong.volume = 0.5;
+
+      // Preload qilish
+      cache.correct.preload = "auto";
+      cache.wrong.preload = "auto";
+
+      return cache;
+    }
+  );
+
+  function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array]; // original arrayni o'zgartirmaslik uchun nusxa
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[randomIndex]] = [
+        shuffled[randomIndex],
+        shuffled[i],
+      ];
+    }
+
+    return shuffled;
+  }
+
+  // Question o'zgarganda options ni shuffle qilish
+  useEffect(() => {
+    if (question?.options?.length > 0) {
+      setShuffledOptions(shuffleArray(question.options));
+    }
+  }, [question.options]);
 
   const playSound = (soundType: "correct" | "wrong") => {
     try {
@@ -80,8 +114,8 @@ const TestScreen: React.FC<TestScreenProps> = ({
     setSelectedAnswer(selectedIndex);
     setShowFeedback(true);
 
-    // Find correct answer using the new API structure
-    const isCorrect = question.options[selectedIndex].is_correct;
+    // Shuffled options ichidan to'g'ri javobni topish
+    const isCorrect = shuffledOptions[selectedIndex].is_correct;
 
     if (isCorrect) {
       playSound("correct"); // Play correct sound
@@ -110,7 +144,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
         } rounded-full flex items-center justify-center`,
       };
 
-    const isCorrect = question.options[index].is_correct;
+    const isCorrect = shuffledOptions[index].is_correct;
     const isSelected = index === selectedAnswer;
 
     if (isCorrect) {
@@ -214,7 +248,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
 
         {/* Answer Options */}
         <div className="space-y-3 mx-5">
-          {question.options.map((option, index) => {
+          {shuffledOptions.map((option, index) => {
             const iconStyle = getIconStyle(index);
             return (
               <button
