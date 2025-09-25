@@ -127,7 +127,7 @@ export default function WordBottleApp(): JSX.Element {
       if (questionsRes.status === 450) {
         setLimitReached(true);
         setPopup(
-          "Siz bugungi barcha so'zlarni topdingiz!\nSiz zo'rsiz\nErtaga qaytib urunib ko'ring"
+          "⚡️Siz zo'rsiz!\n😔 Afsuski, bugungi so'zlar tugab qoldi.\nErtaga qayta urunib ko'ring."
         );
         return [];
       }
@@ -205,17 +205,14 @@ export default function WordBottleApp(): JSX.Element {
     } else {
       setIsPracticeMode(false);
     }
-    console.log(swap);
 
     try {
-      // Questions yuklab olamiz va natijani kutamiz
       const loadedQuestions = await loadQuestions();
-
-      console.log("Loaded questions count:", loadedQuestions.length); // Debug uchun
 
       if (loadedQuestions.length === 0) {
         alert("Savollar yuklanmadi. Iltimos qayta urinib ko'ring.");
         setLoading(false);
+        goBack();
         return;
       }
 
