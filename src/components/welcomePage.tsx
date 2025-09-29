@@ -27,6 +27,7 @@ interface WelcomeScreenProps {
   setIsPracticeMode: React.Dispatch<React.SetStateAction<boolean>>;
   swap: "eng-uzb" | "uzb-eng";
   setSwap: React.Dispatch<React.SetStateAction<"eng-uzb" | "uzb-eng">>;
+  setUserLevel?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface UserInfo {
@@ -49,6 +50,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   setIsPracticeMode,
   swap,
   setSwap,
+  setUserLevel,
 }) => {
   const [data, setData] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         const res = await axios.get<UserInfo>(apiUrl);
 
         setData(res.data);
+        setUserLevel && setUserLevel(res.data.level.name);
         if (res.data.try_count <= 0) {
           setIsPracticeMode(true);
         } else {

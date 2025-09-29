@@ -98,6 +98,7 @@ export default function WordBottleApp(): JSX.Element {
     "swap",
     "eng-uzb"
   );
+  const [userLevel, setUserLevel] = useState<string | null>(null);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -197,8 +198,8 @@ export default function WordBottleApp(): JSX.Element {
   const handleUserInfo = (tryCount: number) => {
     setUserTryCount(tryCount);
   };
+
   const startTest = async () => {
-    // Avval loading holatiga o'tkazamiz
     setLoading(true);
     if (userTryCount <= 0) {
       setIsPracticeMode(true);
@@ -219,9 +220,11 @@ export default function WordBottleApp(): JSX.Element {
       setScore(0);
       setTotalAnswered(0);
       setTimeLeft(10);
+      if (userLevel == "Level 6" || userLevel == "Multi-Level") {
+        setTimeLeft(20);
+      }
       setUsedQuestionIds(new Set());
 
-      // Birinchi savolni yuklab olgan questions array bilan olamiz
       const firstQuestion = getNextQuestion(loadedQuestions);
 
       if (firstQuestion) {
@@ -260,7 +263,7 @@ export default function WordBottleApp(): JSX.Element {
     setCurrentQuestion(null);
     setScore(0);
     setTotalAnswered(0);
-    setTimeLeft(20);
+    setTimeLeft(10);
     setTestStarted(false);
     setUsedQuestionIds(new Set());
   };
@@ -325,6 +328,7 @@ export default function WordBottleApp(): JSX.Element {
           setIsPracticeMode={setIsPracticeMode}
           swap={swap}
           setSwap={setSwap}
+          setUserLevel={setUserLevel}
         />
         ;
       </div>
