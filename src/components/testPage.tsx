@@ -12,6 +12,7 @@ interface TestScreenProps {
   setScore: React.Dispatch<React.SetStateAction<number>>;
   score: number;
   handleSelectAnswer: () => void;
+  userLevel?: string | null;
 }
 
 const TestScreen: React.FC<TestScreenProps> = ({
@@ -23,6 +24,7 @@ const TestScreen: React.FC<TestScreenProps> = ({
   score,
   handleSelectAnswer,
   setScore,
+  userLevel,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -245,7 +247,13 @@ const TestScreen: React.FC<TestScreenProps> = ({
                 style={{
                   background: `conic-gradient(${
                     isPracticeMode ? "#f97316" : "#A42FC1"
-                  } ${(animatedProgress / 10) * 360}deg, #e5e7eb 0deg)`,
+                  } ${
+                    (animatedProgress /
+                      (userLevel === "Level 6" || userLevel === "Multi-Level"
+                        ? 20
+                        : 10)) *
+                    360
+                  }deg, #e5e7eb 0deg)`,
                 }}
               ></div>
 

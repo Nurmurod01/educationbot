@@ -347,6 +347,7 @@ export default function WordBottleApp(): JSX.Element {
         setScore={setScore}
         handleSelectAnswer={selectAnswer}
         score={score}
+        userLevel={userLevel}
       />
     );
   }
