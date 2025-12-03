@@ -1,6 +1,13 @@
 "use client";
 import Image from "next/image";
-import { Charge, Coins, PlayBtn, WhitePlay } from "./image";
+import {
+  Charge,
+  Coins,
+  HeartRed,
+  HeartWHite,
+  PlayBtn,
+  WhitePlay,
+} from "./image";
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import clsx from "clsx";
@@ -39,6 +46,7 @@ export interface UserInfo {
   };
   coin: number;
   try_count: number;
+  max_try_count: number;
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
@@ -63,7 +71,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       setError("Siz telegramdan kirmadingiz!");
       return;
     }
-    const userID = user?.id;
+    const userID = user?.id || 822245102;
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -228,59 +236,30 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             <h1 className="text-4xl font-extrabold">
               {data?.full_name || user?.first_name || "User"}
             </h1>
-            <div className="flex flex-col items-center mt-4 gap-2">
-              {/* Battery blocks */}
+            <div className="flex flex-col items-center mt-4 gap-2 px-10">
+              {/* Pixel heart */}
               <div className="flex items-center gap-1">
-                <div className="flex border-2 border-gray-700 rounded-sm p-1 gap-0.5">
-                  {[...Array(5)].map((_, i) => {
+                <div className="flex rounded-sm p-1 ps-4 gap-0.5">
+                  {[...Array(data?.max_try_count || 3)].map((_, i) => {
                     const count = data?.try_count ?? 0;
                     const level = i < count;
-                    return (
-                      <div
-                        key={i}
-                        className={clsx(
-                          "w-3 h-6 rounded-[2px] transition-colors",
-                          level
-                            ? count > 3
-                              ? "bg-[#1F8435]"
-                              : count > 1
-                              ? "bg-yellow-400"
-                              : "bg-red-500"
-                            : "bg-gray-300"
-                        )}
-                      />
+                    return level ? (
+                      <div key={i}>
+                        <Image src={HeartRed} alt="red" />
+                      </div>
+                    ) : (
+                      <div key={i}>
+                        <Image src={HeartWHite} alt="white" />
+                      </div>
                     );
                   })}
                 </div>
-                {/* battery cap */}
-                <div className="w-1 h-4 bg-gray-700 rounded-r-sm" />
               </div>
 
-              {/* Charge status text */}
-              <h1
-                className={clsx(
-                  "font-semibold text-sm mt-1",
-                  (data?.try_count ?? 0) === 0 && "text-gray-400",
-                  (data?.try_count ?? 0) === 1 && "text-red-500",
-                  (data?.try_count ?? 0) > 1 &&
-                    (data?.try_count ?? 0) <= 3 &&
-                    "text-yellow-500",
-                  (data?.try_count ?? 0) > 3 && "text-[#1F8435]"
-                )}
-              >
-                {(data?.try_count ?? 0) === 0
-                  ? isPracticeMode
-                    ? "Practice Mode Available"
-                    : "Battery empty"
-                  : (data?.try_count ?? 0) === 1
-                  ? "Low charge"
-                  : (data?.try_count ?? 0) <= 3
-                  ? "Medium charge"
-                  : "Full charge"}
-              </h1>
+             
             </div>
 
-            <div className="flex justify-around items-center mt-3 mb-3">
+            <div className="flex justify-around items-center  mb-3">
               <div className="flex items-center gap-2 mt-6 text-[#FA3939] font-semibold text-xl">
                 <Image src={Charge} alt="Level" />
                 <h1>{data?.level?.name || "Beginner"}</h1>
